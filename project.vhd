@@ -55,7 +55,29 @@ begin
                     end if;
                 when READW =>
                     null;
-                when WRITEW =>
+                when WRITEW => 
+                    if i_mem_data = "00000000" then
+                        if prec = "00000000" then
+                            addr <= std_logic_vector(unsigned(addr) + 2);
+                            o_mem_addr <= std_logic_vector(unsigned(addr) + 2);
+                            state <= WRITEW;
+                        else
+                            o_mem_data <= prec;
+                            o_mem_we <= '1';
+                            waiting <= '1';
+                            o_mem_addr <=addr;
+                            addr <= std_logic_vector(unsigned(addr) + 1);
+                            count <= std_logic_vector(unsigned(count) - 1);
+                            state <= CONF;
+                        end if;
+                    else
+                        prec <= i_mem_data;
+                        count <= "00011111";
+                        state <= CONF;
+                        addr <= std_logic_vector(unsigned(addr) + 1);
+                    end if;
+
+            
                     null;
                 when CONF =>
                     null;
