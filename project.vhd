@@ -54,13 +54,35 @@ begin
                         state <= INIT;
                     end if;
                 when READW =>
-                    null;
+                    if unsigned(addr) < unsigned(i_add) + 2 * unsigned(i_k) then
+                        o_mem_we <= '0';
+                        o_mem_addr <= addr;
+                        waiting <= '1';
+                        state <= WRITEW;
+                    else
+                        o_mem_we <= '0';
+                        o_mem_en <= '0';
+                        o_done <= '1';
+                        state <= DONE;
+                    end if;
                 when WRITEW =>
                     null;
                 when CONF =>
-                    null;
+                    o_mem_we <= '1';
+                    o_mem_addr <= addr;
+                    o_mem_data <= count;
+                    addr <= std_logic_vector(unsigned(addr) + 1);
+                    waiting <= '1';
+                    state <= READW;
                 when DONE =>
-                    null;
+                    if i_start <= '0' then
+                        o_done <= '0';
+                        prec <= (others => '0');
+                        count <= "00011111";
+                        state <= INIT;
+                    else
+                        state <= DONE;
+                    end if;
                 when others =>
                     state <= RESET;
             end case;
