@@ -22,89 +22,98 @@ entity project_reti_logiche is
 end project_reti_logiche;
 
 architecture Behavioral of project_reti_logiche is
-  -- segnali vari
-  type state_type is(RESET, INIT, READW, WRITEW, CONF, DONE);
-  signal state   : state_type;
-  signal waiting : std_logic;
-  signal addr    : std_logic_vector(15 downto 0);
-  signal prec    : std_logic_vector(7 downto 0);
-  signal count   : std_logic_vector(7 downto 0);
+    -- segnali vari
+    type state_type is(RESET, INIT, READW, WRITEW, CONF, DONE);
+    signal state   : state_type;
+    signal waiting : std_logic;
+    signal addr    : std_logic_vector(15 downto 0);
+    signal prec    : std_logic_vector(7 downto 0);
+    signal count   : std_logic_vector(7 downto 0);
 
 begin
 
-  fsm : process (i_clk, i_rst)
-  begin
-    if i_rst = '1' or state = RESET then
-      o_done   <= '0';
-      o_mem_en <= '0';
-      o_mem_we <= '0';
-      prec     <= (others => '0');
-      count    <= "00011111";
-    elsif i_clk'event and i_clk = '1' then
-      case state is
-        when INIT =>
-          if i_start = '1' then
-            addr       <= std_logic_vector(unsigned(i_add) + 1);
-            o_mem_addr <= i_add;
-            o_mem_en   <= '1';
-            waiting    <= '1';
-            state      <= WRITEW;
-          else
-            state <= INIT;
-          end if;
-        when READW =>
-            if unsigned(addr) < unsigned(i_add) + 2 * unsigned(i_k) then
-            o_mem_we   <= '0';
-            o_mem_addr <= addr;
-            waiting    <= '1';
-            state      <= WRITEW;
-          else
-            o_mem_we <= '0';
-            o_mem_en <= '0';
-            o_done   <= '1';
-            state    <= DONE;
-          end if;
-        when WRITEW =>
-          if i_mem_data = "00000000" then
-            if prec = "00000000" then
-              addr       <= std_logic_vector(unsigned(addr) + 2);
-              o_mem_addr <= std_logic_vector(unsigned(addr) + 2);
-              state      <= WRITEW;
-            else
-              o_mem_data <= prec;
-              o_mem_we   <= '1';
-              waiting    <= '1';
-              o_mem_addr <= addr;
-              addr       <= std_logic_vector(unsigned(addr) + 1);
-              count      <= std_logic_vector(unsigned(count) - 1);
-              state      <= CONF;
-            end if;
-          else
-            prec  <= i_mem_data;
-            count <= "00011111";
-            state <= CONF;
-            addr  <= std_logic_vector(unsigned(addr) + 1);
-          end if;
-        when CONF =>
-          o_mem_we   <= '1';
-          o_mem_addr <= addr;
-          o_mem_data <= count;
-          addr       <= std_logic_vector(unsigned(addr) + 1);
-          waiting    <= '1';
-          state      <= READW;
-        when DONE =>
-          if i_start <= '0' then
-            o_done     <= '0';
-            prec       <= (others => '0');
-            count      <= "00011111";
-            state      <= INIT;
-          else
-            state <= DONE;
-          end if;
-        when others =>
-          state <= RESET;
-      end case;
+    fsm : process (i_clk, i_rst)
+    begin
+        if i_rst = '1' or state = RESET then
+        o_done   <= '0';
+        o_mem_en <= '0';
+        o_mem_we <= '0';
+        prec     <= (others => '0');
+        count    <= "00011111";
+        state <= INIT;
+        elsif i_clk'event and i_clk = '1' then
+            case state is
+                when INIT =>
+                    if i_start = '1' then
+                        addr       <= std_logic_vector(unsigned(i_add) + 1);
+                        o_mem_addr <= i_add;
+                        o_mem_en   <= '1';
+                        waiting    <= '1';
+                        state      <= WRITEW;
+                    else
+                        state <= INIT;
+                    end if;
 
-    end if;
-  end process;
+
+                when READW =>
+                    if unsigned(addr) < unsigned(i_add) + 2 * unsigned(i_k) then
+                        o_mem_we   <= '0';
+                        o_mem_addr <= addr;
+                        waiting    <= '1';
+                        state      <= WRITEW;
+                    else
+                        o_mem_we <= '0';
+                        o_mem_en <= '0';
+                        o_done   <= '1';
+                        state    <= DONE;
+                    end if;
+
+                when WRITEW =>
+                    if i_mem_data = "00000000" then
+                        if prec = "00000000" then
+                            addr       <= std_logic_vector(unsigned(addr) + 2);
+                            o_mem_addr <= std_logic_vector(unsigned(addr) + 2);
+                            state      <= WRITEW;
+                        else
+                            o_mem_data <= prec;
+                            o_mem_we   <= '1';
+                            waiting    <= '1';
+                            o_mem_addr <= addr;
+                            addr       <= std_logic_vector(unsigned(addr) + 1);
+                            if unsigned(count) > 0 then
+                                count <= std_logic_vector(unsigned(count) - 1);
+                            end if;
+                            state      <= CONF;
+                        end if;
+                    else
+                        prec  <= i_mem_data;
+                        count <= "00011111";
+                        state <= CONF;
+                        addr  <= std_logic_vector(unsigned(addr) + 1);
+                    end if;
+
+                when CONF =>
+                    o_mem_we   <= '1';
+                    o_mem_addr <= addr;
+                    o_mem_data <= count;
+                    addr       <= std_logic_vector(unsigned(addr) + 1);
+                    waiting    <= '1';
+                    state      <= READW;
+
+                when DONE =>
+                    if i_start <= '0' then
+                        o_done     <= '0';
+                        prec       <= (others => '0');
+                        count      <= "00011111";
+                        state      <= INIT;
+                    else
+                        state <= DONE;
+                    end if;
+
+                when others =>
+                    state <= RESET;
+            end case;
+
+        end if;
+    end process;
 end architecture;
