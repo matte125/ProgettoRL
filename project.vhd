@@ -48,7 +48,7 @@ begin
                 case state is
                     when INIT =>
                         if i_start = '1' then
-                            addr       <= std_logic_vector(unsigned(i_add) + 1);
+                            addr       <= std_logic_vector(unsigned(i_add));
                             o_mem_addr <= i_add;
                             o_mem_en   <= '1';
                             waiting    <= '1';
