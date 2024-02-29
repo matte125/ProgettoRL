@@ -24,8 +24,12 @@ end project_reti_logiche;
 
 architecture Behavioral of project_reti_logiche is
 -- segnali vari
-type state_type is(RESET, START, DONE);
+type state_type is(RESET, INIT, READW, WRITEW, CONF, DONE);
 signal state : state_type;
+signal waiting : std_logic;
+signal addr : std_logic_vector(15 downto 0);
+signal prec : std_logic_vector(7 downto 0);
+signal count : std_logic_vector(7 downto 0);
 
 begin
 
@@ -35,13 +39,30 @@ begin
             o_done <= '0';
             o_mem_en <= '0';
             o_mem_we <= '0';
+            prec <= (others => '0');
+            count <= "00011111";
         elsif i_clk'event and i_clk = '1' then
             case state is
-                when START =>
+                when INIT =>
+                    if i_start = '1' then
+                        addr <= std_logic_vector(unsigned(i_add) + 1);
+                        o_mem_addr <= i_add;
+                        o_mem_en <= '1';
+                        waiting <= '1';
+                        state <= WRITEW;
+                    else
+                        state <= INIT;
+                    end if;
+                when READW =>
                     null;
-            
+                when WRITEW =>
+                    null;
+                when CONF =>
+                    null;
+                when DONE =>
+                    null;
                 when others =>
-                    state <= reset;
+                    state <= RESET;
             end case;
         
         end if;
