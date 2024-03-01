@@ -48,11 +48,16 @@ begin
                 case state is
                     when INIT =>
                         if i_start = '1' then
-                            addr       <= std_logic_vector(unsigned(i_add));
-                            o_mem_addr <= i_add;
-                            o_mem_en   <= '1';
-                            waiting    <= '1';
-                            state      <= WRITEW;
+                            if unsigned(i_k) = 0 then
+                                o_done <= '1';
+                                state <= DONE;
+                            else
+                                addr       <= std_logic_vector(unsigned(i_add));
+                                o_mem_addr <= i_add;
+                                o_mem_en   <= '1';
+                                waiting    <= '1';
+                                state      <= WRITEW;
+                            end if;
                         else
                             state <= INIT;
                         end if;
