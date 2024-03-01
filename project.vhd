@@ -76,7 +76,7 @@ begin
                             if prec = "00000000" then
                                 addr       <= std_logic_vector(unsigned(addr) + 2);
                                 o_mem_addr <= std_logic_vector(unsigned(addr) + 2);
-                                state      <= WRITEW;
+                                state      <= READW;
                             else
                                 o_mem_data <= prec;
                                 o_mem_we   <= '1';
