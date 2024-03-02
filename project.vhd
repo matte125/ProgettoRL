@@ -25,10 +25,10 @@ architecture Behavioral of project_reti_logiche is
     -- segnali vari
     type state_type is(RESET, INIT, READW, WRITEW, CONF, DONE);
     signal state   : state_type;
-    signal waiting : std_logic;
-    signal addr    : std_logic_vector(15 downto 0);
-    signal prec    : std_logic_vector(7 downto 0);
-    signal count   : std_logic_vector(7 downto 0);
+    signal waiting : std_logic; -- Segnale che viene posto a 1 per aspettare il prossimo fronte di salita del clock
+    signal addr    : std_logic_vector(15 downto 0); -- Segnale utilizzato per incrementare l'indirizzo da dare in output alla memoria
+    signal prec    : std_logic_vector(7 downto 0); -- Segnale che contiene l'ultima parola valida letta dalla memoria (diversa da 0)
+    signal count   : std_logic_vector(7 downto 0); -- Segnale che contiene il valore di credibilità
 
 begin
 
