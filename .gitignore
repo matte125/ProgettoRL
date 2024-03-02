@@ -1,4 +1,5 @@
 Makefile
 *.ghw
 *.cf
-*.txt
+/*.txt
+Testbench/gen
