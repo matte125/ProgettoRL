@@ -109,7 +109,7 @@ begin
                         state      <= READW;
 
                     when DONE =>
-                        if i_start <= '0' then
+                        if i_start = '0' then
                             o_done     <= '0';
                             prec       <= (others => '0');
                             count      <= "00011111";
