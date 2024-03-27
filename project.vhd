@@ -51,11 +51,12 @@ begin
                     -- Stato di inizializzazione
                     when INIT =>
                         if i_start = '1' then
-                            -- Boundary case: k = 0
+                            -- Boundary case: k = 0, skip alla fine
                             if unsigned(i_k) = 0 then
                                 o_done <= '1';
                                 state  <= DONE;
                             else
+                                -- Richiede la lettura del primo valore di W
                                 addr       <= std_logic_vector(unsigned(i_add));
                                 o_mem_addr <= i_add;
                                 o_mem_en   <= '1';
