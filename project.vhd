@@ -95,7 +95,6 @@ begin
                                 -- W è 0, rimpiazza con la più recente W diversa da 0
                                 o_mem_data <= prec;
                                 o_mem_we   <= '1';
-                                waiting    <= '1';
                                 o_mem_addr <= addr;
                                 addr       <= std_logic_vector(unsigned(addr) + 1);
                                 -- Decrementa la confidenza solo se positiva
@@ -118,7 +117,6 @@ begin
                         o_mem_addr <= addr;
                         o_mem_data <= count;
                         addr       <= std_logic_vector(unsigned(addr) + 1);
-                        waiting    <= '1';
                         state      <= READW;
                     
                     -- Stato finale, aspetta finchè il sengale di start è alto

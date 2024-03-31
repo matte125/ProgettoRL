@@ -3,3 +3,5 @@ Makefile
 *.cf
 /*.txt
 Testbench/gen
+tb_gen
+*.o
